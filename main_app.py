@@ -1,4 +1,4 @@
-## main_app.py
+## main_app.py - PASSWORD REMOVED
 
 import streamlit as st
 from PIL import Image
@@ -14,10 +14,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Admin and Sub User Credentials
-CREDENTIALS = {
-    "Globalite": "LalitaYadav",  # Admin User
-    "User": "Kuber"              # Sub User
+# Admin and Sub User Credentials (Now only storing User IDs for access control)
+USER_ACCESS = {
+    "Globalite": "Admin",  # Admin User
+    "User": "Sub User"     # Sub User
 }
 ADMIN_USER = "Globalite"
 
@@ -32,13 +32,11 @@ if 'logged_in' not in st.session_state:
 def apply_custom_css():
     """Applies custom CSS for styling (trying to match the 'Bankco' theme look)"""
     
-    # Base colors derived from the target aesthetic (light background, blue accents)
     PRIMARY_COLOR = "#007bff" 
     BACKGROUND_COLOR = "#ffffff"
     SECONDARY_BACKGROUND_COLOR = "#f7f7f7" 
     TEXT_COLOR = "#333333"
 
-    # HTML/CSS injection for styling
     custom_css = f"""
     <style>
     /* Global Background and Text */
@@ -71,7 +69,7 @@ def apply_custom_css():
         transition: background-color 0.3s;
     }}
     .stButton>button:hover {{
-        background-color: #0056b3; /* Darker blue on hover */
+        background-color: #0056b3; 
     }}
     
     /* Footer Style */
@@ -231,7 +229,7 @@ def configuration_tab():
     if st.session_state.is_admin:
         st.success(f"Welcome Admin **{st.session_state.username}**. You have full access.")
         st.subheader("API Key Management")
-        st.text_input("OpenAI/Image Optimization API Key", type="password", value="***********")
+        st.text_input("OpenAI/Image Optimization API Key", disabled=True, value="No password required for this app!")
         
         st.subheader("User Management (Placeholder)")
         st.table(pd.DataFrame({
@@ -251,24 +249,24 @@ def run_app():
     # Apply custom styling first
     apply_custom_css()
 
-    # --- A. LOGIN INTERFACE ---
+    # --- A. LOGIN INTERFACE (User ID Only) ---
     if not st.session_state.logged_in:
-        st.title("🔐 E-commerce Solution Login Interface")
+        st.title("🔐 E-commerce Solution Access")
+        st.info("Enter your User ID to gain access. (No password required)")
         
         with st.form("login_form"):
-            username_input = st.text_input("User ID", key="user_id_input")
-            password_input = st.text_input("Password", type="password", key="password_input")
-            submitted = st.form_submit_button("Login")
+            username_input = st.text_input("User ID", key="user_id_input").strip() # .strip() cleans whitespace
+            submitted = st.form_submit_button("Access App")
             
             if submitted:
-                if username_input in CREDENTIALS and CREDENTIALS[username_input] == password_input:
+                if username_input in USER_ACCESS:
                     st.session_state.logged_in = True
                     st.session_state.username = username_input
                     st.session_state.is_admin = (username_input == ADMIN_USER)
-                    st.success(f"Login successful! Welcome, {st.session_state.username}")
+                    st.success(f"Access granted! Welcome, {st.session_state.username}")
                     st.rerun() # Refresh app to show main interface
                 else:
-                    st.error("Invalid User ID or Password")
+                    st.error("Invalid User ID. Please use 'Globalite' (Admin) or 'User' (Sub User).")
         
     # --- B. MAIN APPLICATION INTERFACE (After Login) ---
     else:
